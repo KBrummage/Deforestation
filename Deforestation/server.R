@@ -18,6 +18,8 @@ shinyServer(function(input, output) {
     
 deforestationData <- read.csv("data/annual-change-forest-area.csv")
 sqAreaData <- read.csv("data/landArea.csv")
+aff <- read.csv("data/agricultureFishingForestry(%GDP).csv")
+gcf <- read.csv("data/grosscapitalformation(%GDP).csv")
 
 dfrstn <- deforestationData %>%
     select(Entity, Year, Net.forest.conversion) %>%
@@ -31,8 +33,18 @@ sqArea <- sqAreaData%>%
     mutate(Entity = replace(Entity, Entity == "United States", "USA"))
 
 world_map <- map_data("world")
-    
-    dfrstn <- left_join(sqArea, dfrstn, by = "Entity" )
+
+sqAreaLuke <- sqArea 
+
+aff <- aff %>% 
+    select(Country.Name, X2005) %>%
+    rename(region = Country.Name, aff = X2005)
+
+gcf <- gcf %>% 
+    select(Country.Name, X2005) %>% 
+    rename(region = Country.Name, gcf = X2005)
+
+dfrstn <- left_join(sqArea, dfrstn, by = "Entity" )
 
 dfrstn <- dfrstn %>%
     mutate(percentChange = (netForestChange/totalArea) * 100)
@@ -52,6 +64,19 @@ dfrstn10 <- dfrstnForMap %>%
 dfrstn90 <- dfrstnForMap %>%
     filter(Year == 1990)
 
+aff <- left_join(aff, gcf, by = "region")
+Indicators <- left_join(dfrstnForMap, aff, by = "region")
+
+Indicators <- Indicators %>%
+    rename(netForest = netForestChange) %>%
+    na.omit()
+
+
+ggplot(Indicators, aes(x = gcf, y = percentChange)) +
+    geom_point() +
+    geom_smooth(method="lm") +
+    xlim(15, 30) +
+    ylim(-.1, .1)
 dfrstn15Map <- left_join(world_map,dfrstn15, by = "region")
 dfrstn10Map <- left_join(world_map,dfrstn10, by = "region")
 dfrstn00Map <- left_join(world_map,dfrstn00, by = "region")
@@ -65,7 +90,6 @@ dfrstn90Map <- left_join(world_map,dfrstn90, by = "region")
         
         # draw the histogram with the specified number of bins
         hist(x, breaks = bins, col = 'darkgray', border = 'white')
-        
     })
     
     output$plot = renderPlot({
@@ -107,12 +131,30 @@ dfrstn90Map <- left_join(world_map,dfrstn90, by = "region")
                                 labels = c("-4mil Hectares", "-3mil Hectares", "-2mil Hectares", "-1mil Hectares", "Zero Net Change", "+1mil Hectares", "+2mil Hectares", "+3mil Hectares", "+4mil Hectares"),
                                 breaks = c(-4000000, -3000000, -2000000, -1000000, 0, 1000000, 2000000, 3000000, 4000000))
     })
-    output$Lukeplot = renderPlot({
-        ggplot(lukeData, aes_string(x = input$indicatorSelect, y = totalArea)) +
+    output$affPlot <- renderPlot({
+        ggplot(Indicators, aes(x = aff, y = percentChange)) +
             geom_point() +
-            xlim(0, 30) +
-            ylim(-150000, 150000) 
+            geom_smooth(method="lm") +
+            xlim(15, 30) +
+            ylim(-.1, .1) +
+            labs(title = "Change of Forest Cover Percentage by Country", subtitle = "Measured against Agriculture, Fishing, & Forestry Industries") +
+            labs(x = "Agriculture, Fishing, & Forestry Industries as % of GDP",
+                 y = "Annual Percentage Change of Forest Cover")
+        
     })
+    
+    output$gcfPlot <- renderPlot({
+        ggplot(Indicators, aes(x = gcf, y = percentChange)) +
+            geom_point() +
+            geom_smooth(method="lm") +
+            xlim(15, 30) +
+            ylim(-.1, .1) +
+            labs(title = "Change of Forest Cover Percentage by Country", subtitle = "Measured against Gross Capital Formation") +
+            labs(x = "Gross Capital Formation as % of GDP",
+                 y = "Annual Percentage Change of Forest Cover")
+        
+    })
+    
     
     
 })

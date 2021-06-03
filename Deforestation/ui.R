@@ -91,13 +91,19 @@ shinyUI(
                  fluidPage(
                      titlePanel(
                          h1("Largest Indicators of Deforestation Nationally", align = "center")),
-                     sidebarLayout(
+                     
                          sidebarPanel(
-                             h2("Luke's sideBarPanel")
+                             h2("Two Trendline charts showing moderate correlation between"),
+                             tags$ol(
+                               tags$li("Percentage of GDP in the agriculture/forestry/fishing industry"),
+                               tags$li("Percentage of GDP in Gross Capital Formation")
+                             )
                              
                          ),
-                         mainPanel(h2("Luke's mainPanel"))
-                     )
+                         mainPanel(plotOutput("affPlot"),
+                                   tags$hr(),
+                                   plotOutput("gcfPlot")
+                        )
                  )
         ),
         tabPanel("Key Take Aways",
