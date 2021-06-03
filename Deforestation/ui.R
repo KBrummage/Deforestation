@@ -10,39 +10,84 @@
 library(shiny)
 
 # Define UI for application that draws a histogram
-shinyUI(fluidPage(
-
-    # Application title
-    titlePanel(
-        h1("Net Forest Change", align = "center")
-    ),
-
-    # Sidebar with a slider input for number of bins
-    sidebarLayout(
-        sidebarPanel(
-            selectizeInput("country",
-                           "Select Country:",
-                           choices = c("Bulgaria", 
-                                       "Czech Republic",
-                                       "Denmark",
-                                       "Poland",
-                                       "Sweden",
-                                       "Norway",
-                                       "World"),
-                           selected = "World"
-                           )  
+shinyUI(
+    navbarPage("Gobal Deforestation Rates",
+        tabPanel("Intro",
+            fluidPage(
+                titlePanel(
+                    h1("Net Forest Change", align = "center")),
+                    mainPanel(h2("Hello World"))
+                )
             ),
-    
-        # Show a plot of the generated distribution
-        mainPanel(
-            tabsetPanel(type = "tabs",
-                        tabPanel("World Heat Map", tags$h2("my heat map is going here")),
-                        tabPanel("Plot", plotOutput("plot")),
-                        tabPanel("Chloe", tags$h2("maybe Chloe's chart here")),
-                        tabPanel("Luke", tags$h2("maybe Luke's chart here"))
-                        
+        
+        tabPanel("Global Heat Map",
+            fluidPage(
+                h1("Map of Global Deforestation Rates", align="center"),
+                sidebarLayout(
+                    sidebarPanel(
+                        selectInput(inputId = "yearChoice", 
+                                    label = "Select the Dataset Year of your choice", 
+                                    choices = c("1990","2000", "2010", "2015")
+                                    ),
+                        selectInput(inputId = "percentageChoice", 
+                                    label = "Select the Dataset as net or percentage loss", 
+                                    choices = c("net", "percentage")
+                                    )
+                        ),
+                    mainPanel(plotOutput("heatMap"))
+                )
             )
-           
+        ),
+        
+        tabPanel("Chloe",
+                 fluidPage(
+                     titlePanel(
+                         h1("Chloe, put stuff here", align = "center")),
+                     mainPanel(h2("Hello World"))
+                 )
+        ),
+
+        tabPanel("Country Net Forest Change",
+            fluidPage(
+                titlePanel(
+                    h1("Net Forest Change", align = "center")
+                ),
+                sidebarPanel(
+                    selectizeInput("country", "Select Country:",
+                        choices = c("Bulgaria","Czech Republic",
+                                    "Denmark","Poland","Sweden",
+                                    "Norway", "World"),
+                        selected = "World"
+                    )
+                         
+                ),
+                mainPanel(plotOutput("plot"))
+            )
+        ),
+        
+        tabPanel("Luke",
+                 fluidPage(
+                     titlePanel(
+                         h1("Luke, put your stuff here", align = "center")),
+                     mainPanel(h2("Hello World"))
+                 )
+        ),
+        tabPanel("Key Take Aways",
+                 fluidPage(
+                     titlePanel(
+                         h1("Like it says, Key Take Aways", align = "center")),
+                     mainPanel(h2("Hello World"))
+                 )
         )
+        
+        
     )
-))
+)
+
+                 
+      
+                
+    
+    
+    
+   

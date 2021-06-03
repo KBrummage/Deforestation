@@ -35,21 +35,26 @@ dfrstn <- dfrstn %>%
 dfrstnLine <- dfrstn %>%
     na.omit()
 
-print(head(dfrstnLine))
+lukeData <- dfrstn %>%
+    na.omit() %>%
+    rename(aff = netForestChange, gcf = percentChange) 
+
+print(head(lukeData))
+
 
 # Define server logic required to draw a histogram
 shinyServer(function(input, output) {
     
     
     output$distPlot <- renderPlot({
-
+        
         # generate bins based on input$bins from ui.R
         x    <- faithful[, 2]
         bins <- seq(min(x), max(x), length.out = input$bins + 1)
-
+        
         # draw the histogram with the specified number of bins
         hist(x, breaks = bins, col = 'darkgray', border = 'white')
-
+        
     })
     
     output$plot = renderPlot({
@@ -61,6 +66,30 @@ shinyServer(function(input, output) {
                  y = "Annual Net Change of Forest Cover (in Hectares)")
     })
     
+    output$heatMap <- renderPlot({
+        data = switch(input$yearChoice,
+                      "1990" = dfrstn90Map,
+                      "2000" = dfrstn00Map,
+                      "2010" = dfrstn10Map,
+                      "2015" = dfrstn15Map)
+        
+        fillChoice = switch(input$percentageChoice,
+                      "net" = "netForestChange",
+                      "percentage" = "percentChange")
+        
+        ggplot(data, aes(long, lat, group = group))+
+            geom_polygon(aes_string(fill= fillChoice), 
+                         color = "white") +
+            scale_fill_gradient(high = "green", low= "red", name="Net Forestation Change", 
+                                labels = c("-4mil Hectares", "-3mil Hectares", "-2mil Hectares", "-1mil Hectares", "Zero Net Change", "+1mil Hectares", "+2mil Hectares", "+3mil Hectares", "+4mil Hectares"),
+                                breaks = c(-4000000, -3000000, -2000000, -1000000, 0, 1000000, 2000000, 3000000, 4000000))
+    })
+    output$Lukeplot = renderPlot({
+        ggplot(lukeData, aes_string(x = input$indicatorSelect, y = totalArea)) +
+            geom_point() +
+            xlim(0, 30) +
+            ylim(-150000, 150000) 
+    })
     
-
+    
 })
