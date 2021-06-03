@@ -7,6 +7,11 @@ require(maps)
 deforestationData <- read.csv("Deforestation/data/annual-change-forest-area.csv")
 sqAreaData <- read.csv("Deforestation/data/landArea.csv")
 
+dfrstn <- deforestationData %>%
+  select(Entity, Year, Net.forest.conversion) %>%
+  rename(netForestChange = Net.forest.conversion)
+ 
+  
 sqArea <- sqAreaData%>%
   select(Country.Name, X2005) %>%
   rename(Entity = Country.Name, totalArea = X2005) %>%
@@ -15,33 +20,10 @@ sqArea <- sqAreaData%>%
 
 world_map <- map_data("world") %>%
   
-ggplot(world_map, aes(x = long, y = lat, group = group)) +
-  geom_polygon(fill="lightgray", colour = "white")
-
-
-dfrstn <- deforestationData %>%
-  select(Entity, Year, Net.forest.conversion) %>%
-  rename(netForestChange = Net.forest.conversion)%>%
-  mutate(Entity = replace(Entity, Entity == "United States", "USA")) %>%
-  mutate(Entity = replace(Entity, Entity == "Congo, Dem. Rep.", "Democratic Republic of the Congo"))
-
-
-
 dfrstn <- left_join(sqArea, dfrstn, by = "Entity" )
 
-wide = dfrstn %>%
-  spread(Year, netForestChange)
-
-wide <- wide %>%
-  select(Entity, totalArea, "1990", "2000", "2010", "2015") %>%
-  na.omit()
-
-wide1 <- wide %>%
-  slice_head()
-
 dfrstn <- dfrstn %>%
-  mutate(percentChange = (netForestChange/totalArea) * 100) %>%
-  arrange(desc(percentChange))
+  mutate(percentChange = (netForestChange/totalArea) * 100)
 
 dfrstnForMap <- dfrstn %>%
   rename(region = Entity)
@@ -77,25 +59,3 @@ ggplot(dfrstn90Map, aes(long, lat, group = group))+
                       labels = c("-.1% Loss","-.05% Loss", "No net loss",".05% Gain",".1% Gain"),
                       breaks = c(-0.1, -.05, 0, .05, .1))
 
-
-dfrstnLine <- dfrstn %>%
-  na.omit()
-
-
-
-
-ggplot(dfrstn15, aes(long, lat, group = group))+
-  geom_polygon(aes(fill = percent ), color = "black")
-
-
-ArgentinaDeforestation <- dfrstn %>%
-  filter(Entity == "Argentina") 
-  
-worldDeforestation <- dfrstn %>%
-  filter(Entity == "World")
-  
-ggplot(data=worldDeforestation, aes(x=Year, y=netForestChange, group=1)) +
-  geom_line()+
-  geom_point()
-
-head(dfrstn15)
