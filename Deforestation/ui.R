@@ -16,9 +16,25 @@ shinyUI(
             fluidPage(
                 titlePanel(
                     h1("Net Forest Change", align = "center")),
-                    mainPanel(h2("Hello World"))
-                )
-            ),
+                    sidebarLayout(
+                        sidebarPanel(
+                            tags$h2("Global Deforestation Rates", align="center"),
+                            tags$p(tags$b("Deforestation"), "is the permanent removal of trees to make room for something besides forest."),
+                            tags$p("This can include clearing the land for agriculture or grazing, or using the timber for fuel, construction or manufacturing."),
+                            tags$hr(),
+                            tags$h4("Top causes of deforestation"),
+                            tags$ul(
+                                tags$li("agriculture"),
+                                tags$li("unsustainable forest management"),
+                                tags$li("mining"),
+                                tags$li("infrastructure projects"),
+                                tags$li("increased fire incidence and intensity")
+                            )
+                        ),
+                        mainPanel(plotOutput("mainMap"))
+                    )
+            )
+        ),
         
         tabPanel("Global Heat Map",
             fluidPage(
@@ -39,11 +55,17 @@ shinyUI(
             )
         ),
         
-        tabPanel("Chloe",
+        tabPanel("Major Contributors to Deforestation",
                  fluidPage(
                      titlePanel(
-                         h1("Chloe, put stuff here", align = "center")),
-                     mainPanel(h2("Hello World"))
+                         h1("Top 5 Largest Contributors to Global Deforestation", align = "center")),
+                     sidebarLayout(
+                        sidebarPanel(
+                         h2("sideBarPanel")
+                         
+                        ),
+                        mainPanel(h2("mainPanel"))
+                     )
                  )
         ),
 
@@ -65,11 +87,17 @@ shinyUI(
             )
         ),
         
-        tabPanel("Luke",
+        tabPanel("Key Global Indicators",
                  fluidPage(
                      titlePanel(
-                         h1("Luke, put your stuff here", align = "center")),
-                     mainPanel(h2("Hello World"))
+                         h1("Largest Indicators of Deforestation Nationally", align = "center")),
+                     sidebarLayout(
+                         sidebarPanel(
+                             h2("Luke's sideBarPanel")
+                             
+                         ),
+                         mainPanel(h2("Luke's mainPanel"))
+                     )
                  )
         ),
         tabPanel("Key Take Aways",
