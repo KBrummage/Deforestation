@@ -18,8 +18,8 @@ shinyServer(function(input, output) {
     
 deforestationData <- read.csv("data/annual-change-forest-area.csv")
 sqAreaData <- read.csv("data/landArea.csv")
-aff <- read.csv("data/agricultureFishingForestry(%GDP).csv")
-gcf <- read.csv("data/grosscapitalformation(%GDP).csv")
+aff <- read.csv("data/agriculture-fishing-forestry-gdp.csv")
+gcf <- read.csv("data/gross-capital-formation-gdp.csv")
 
 dfrstn <- deforestationData %>%
     select(Entity, Year, Net.forest.conversion) %>%
