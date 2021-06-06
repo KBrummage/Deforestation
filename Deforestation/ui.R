@@ -36,9 +36,9 @@ shinyUI(
             )
         ),
         
-        tabPanel("Global Heat Map",
+        tabPanel("Major Contributors to Deforestation",
             fluidPage(
-                h1("Map of Global Deforestation Rates", align="center"),
+                h1("Global Deforestation Rates", align="center"),
                 sidebarLayout(
                     sidebarPanel(
                         selectInput(inputId = "yearChoice", 
@@ -50,24 +50,12 @@ shinyUI(
                                     choices = c("net", "percentage")
                                     )
                         ),
-                    mainPanel(plotOutput("heatMap"))
+                    mainPanel(plotOutput(outputId ="heatMap", height = 350),
+                              plotOutput(outputId = "heatChart", height = 350))
                 )
             )
         ),
         
-        tabPanel("Major Contributors to Deforestation",
-                 fluidPage(
-                     titlePanel(
-                         h1("Top 5 Largest Contributors to Global Deforestation", align = "center")),
-                     sidebarLayout(
-                        sidebarPanel(
-                         h2("sideBarPanel")
-                         
-                        ),
-                        mainPanel(h2("mainPanel"))
-                     )
-                 )
-        ),
 
         tabPanel("Country Net Forest Change",
             fluidPage(
@@ -76,14 +64,13 @@ shinyUI(
                 ),
                 sidebarPanel(
                     selectizeInput("country", "Select Country:",
-                        choices = c("Bulgaria","Czech Republic",
-                                    "Denmark","Poland","Sweden",
-                                    "Norway", "World"),
+                        choices = c("Aruba","Argentina","Austria","Azerbaijan","Burundi","Belgium","Bangladesh","Bulgaria","Bahrain","Belarus","Belize","Bolivia","Brazil","Bhutan","Central African Republic","Canada","Switzerland","Chile","China","Cameroon","Colombia","Costa Rica","Cuba","Cayman Islands","Germany","Djibouti","Denmark","Algeria","Ecuador","Spain","Estonia","Ethiopia","Faroe Islands","Gabon","Georgia","Gibraltar","Equatorial Guinea","Greenland","Guatemala","Guyana","Honduras","Croatia","Hungary","Indonesia","Isle of Man","India","Ireland","Iraq","Iceland","Jamaica","Kuwait","Liberia","Liechtenstein","Lithuania","Latvia","Morocco","Monaco","Moldova","Maldives","Mexico","Mali","Myanmar","Montenegro","Mongolia","Mozambique","Mauritania","Mauritius","Malawi","Niger","Nigeria","Nicaragua","Netherlands","Norway","Nepal","Nauru","New Zealand","Panama","Peru","Papua New Guinea","Poland","Paraguay","Qatar","Romania","Sudan","Senegal","Singapore","El Salvador","San Marino","Somalia","Serbia","Sao Tome and Principe","Suriname","Slovenia","Sweden","Togo","Thailand","Tunisia","Turkey","Tanzania","Uganda","Ukraine","Uzbekistan","Vietnam","South Africa","Zambia","Zimbabwe","World"),
                         selected = "World"
-                    )
+                    ),
+                    
                          
                 ),
-                mainPanel(plotOutput("plot"))
+                mainPanel(plotOutput("plot1"))
             )
         ),
         
@@ -93,27 +80,39 @@ shinyUI(
                          h1("Largest Indicators of Deforestation Nationally", align = "center")),
                      
                          sidebarPanel(
-                             h2("Two Trendline charts showing moderate correlation between"),
+                             h2("Moderate correlation between specific global indicators and deforestation"),
                              tags$ol(
-                               tags$li("Percentage of GDP in the agriculture/forestry/fishing industry"),
-                               tags$li("Percentage of GDP in Gross Capital Formation")
+                               tags$li(tags$b("Percentage of GDP in the agriculture/forestry/fishing industry"),
+                                       tags$p(tags$em("moderate negative correlation")),
+                                       tags$p("Generally, the larger percentage the agriculture/fishing/forestry industries take of GDP, indicated a higher percent of forest cleared")),
+                               tags$li(tags$b("Percentage of GDP in Gross Capital Formation"),
+                                       tags$p(tags$em("moderate positive correlation")),
+                                       tags$p("Overall, we found a larger gross capital formation percentage of GDP, the lower percent of forest cleared"))
                              )
                              
                          ),
-                         mainPanel(plotOutput("affPlot"),
+                         mainPanel(plotOutput("affPlot", height = 350),
                                    tags$hr(),
-                                   plotOutput("gcfPlot")
+                                   plotOutput("gcfPlot", height = 350)
                         )
                  )
         ),
         tabPanel("Key Take Aways",
                  fluidPage(
                      titlePanel(
-                         h1("Like it says, Key Take Aways", align = "center")),
-                     mainPanel(h2("Hello World"))
-                 )
+                         h1("Key Take Aways", align = "center")),
+                     mainPanel(
+                       tags$ul(
+                         tags$li(tags$h4("Finding key indicators that can predict deforestation is not as simple as perceived.")),
+                         tags$li(tags$h4("There is a moderate correlation between agriculture industries")),
+                         tags$li(tags$h4("With a total of 127 billion hectares globally, and only 74 billion reported on average for each period, roughly 42% of global data is missing.")),
+                         tags$li(tags$h4("Changes due to global conflicts are hard to decipher"))
+                         ),
+                       
+                       )
+                     )
+                 
         )
-        
         
     )
 )
