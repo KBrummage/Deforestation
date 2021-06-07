@@ -83,32 +83,36 @@ shinyUI(
         tabPanel("Key Global Indicators",
                  fluidPage(
                      titlePanel(
-                         h1("Largest Indicators of Deforestation Nationally", align = "center")),
+                         h1("Largest Indicators of Deforestation Globally", align = "center")),
                      
                          sidebarPanel(
                              h2("Moderate correlation between specific global indicators and deforestation"),
                              radioButtons("keyIndicators", label = h3("key global indicators"),
-                                          choices = list("Agriculture, forestry, and fishing, value added (% of GDP)" = "aFF", 
-                                                         "Livestock production index" = 2, 
-                                                         "Agricultural land (% of land area)" = 3), 
-                                          selected = 1),
-                             
-                             tags$ol(
-                               tags$li(tags$b("Percentage of GDP in the agriculture/forestry/fishing industry"),
-                                       tags$p(tags$em("moderate negative correlation")),
-                                       tags$p("Generally, the larger percentage the agriculture/fishing/forestry industries take of GDP, indicated a higher percent of forest cleared")),
-                               tags$li(tags$b("Percentage of GDP in Gross Capital Formation"),
-                                       tags$p(tags$em("moderate positive correlation")),
-                                       tags$p("Overall, we found a larger gross capital formation percentage of GDP, the lower percent of forest cleared"))
-                             )
-                             
+                                          choices = list("CO2 Emissions" = "CO2Emissions",
+                                                         "Cereal Production" = "cereal",
+                                                         "Methane Emissions" = "methaneEmissions",
+                                                         "Gross Capital Formation (% of GDP)" = "gCF",
+                                                         "Forest area (% of land area)" = "forestArea",
+                                                         "Livestock production index" = "lPI", 
+                                                         "Agricultural land (% of land area)" = "aPL",
+                                                         "Crop Production Index" = "cPI",
+                                                         "Agriculture, forestry, and fishing, value added (% of GDP)" = "aFF" 
+                                                        
+                                                         ), 
+                                          selected = "CO2Emissions"),
+                             radioButtons("netPercent", label = h3("annual net or percent difference"),
+                                          choices = list("Annual Net Change of Forest Cover" = "netForestChange",
+                                                        "Annual Percentage Change of Forest Cover" = "percentChange" 
+                                                        ), 
+                                          selected = "netForestChange")
+
                          ),
                          mainPanel(plotOutput(outputId = "indicatorPlot"),
-                                    plotOutput("affPlot", height = 350),
-                                   tags$hr(),
-                                   plotOutput("gcfPlot", height = 350)
+                                   tags$p(textOutput("value"))
+                                   )
+                                   
                         )
-                 )
+                 
         ),
         tabPanel("Key Take Aways",
                  fluidPage(

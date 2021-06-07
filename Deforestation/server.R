@@ -32,7 +32,7 @@ agricultureFishingForestry <- read.csv("data/agriculture-fishing-forestry-gdp.cs
 
 grossCapitalFormation <- read.csv("data/gross-capital-formation-gdp.csv") %>%
     select(Country.Name, X2005) %>%
-    rename(Entity = Country.Name, cFF = X2005)
+    rename(Entity = Country.Name, gCF = X2005)
 
 agriculturalPercentOfLand <- read.csv("data/agricultural-percent-of-land.csv") %>%
     select(Country.Name, X2005) %>%
@@ -54,9 +54,13 @@ methaneEmissions <- read.csv("data/methane-emisions.csv") %>%
     select(Country.Name, X2005) %>%
     rename(Entity = Country.Name, methaneEmissions = X2005)
 
-nitrousOxideEmissions <- read.csv("data/nitrous-oxide-emisions.csv") %>%
+cerealDevelopment <- read.csv("data/cerealProduction.csv") %>%
     select(Country.Name, X2005) %>%
-    rename(Entity = Country.Name, nitOxEmission = X2005)
+    rename(Entity = Country.Name, cereal = X2005)
+
+forestArea <- read.csv("data/forestArea.csv") %>%
+    select(Country.Name, X2005) %>%
+    rename(Entity = Country.Name, forestArea = X2005)
 
 dfrstnIndicators <- left_join(sqArea, deforestationData, by = "Entity" ) %>%
     mutate(percentChange = (netForestChange/totalArea) * 100)
@@ -68,10 +72,15 @@ dfrstnIndicators <- left_join(dfrstnIndicators, cropProductionIndex, by = "Entit
 dfrstnIndicators <- left_join(dfrstnIndicators, livestockProductionIndex, by = "Entity" )
 dfrstnIndicators <- left_join(dfrstnIndicators, co2Emissions, by = "Entity" )
 dfrstnIndicators <- left_join(dfrstnIndicators, methaneEmissions, by = "Entity" )
-dfrstnIndicators <- left_join(dfrstnIndicators, nitrousOxideEmissions, by = "Entity" )
+dfrstnIndicators <- left_join(dfrstnIndicators, cerealDevelopment, by = "Entity")
+dfrstnIndicators <- left_join(dfrstnIndicators, forestArea, by = "Entity")
+
+dfrstnIndicators <- dfrstnIndicators %>%
+    filter(totalArea < 942469981) %>%
+    mutate(Entity = replace(Entity, Entity == "United States", "USA"))
 
 dfrstn <- deforestationData
-dfrstnForMap <- dfrstn %>%
+dfrstnForMap <- dfrstnIndicators %>%
     na.omit() %>%
     rename(region = "Entity")
 
@@ -156,29 +165,76 @@ output$plot1 = renderPlot({
                                 breaks = c(-4000000, -3000000, -2000000, -1000000, 0, 1000000, 2000000, 3000000, 4000000))
     })
     
+    output$value <- renderText({ 
+        indicator <- input$keyIndicators
+        if(indicator == "CO2Emissions"){
+            "Carbon dioxide emissions are those stemming from the burning of fossil fuels and the manufacture of cement. They include carbon dioxide produced during consumption of solid, liquid, and gas fuels and gas flaring."
+        } else if (indicator == "cereal"){
+            print("Production data on cereals relate to crops harvested for dry grain only. Cereal crops harvested for hay or harvested green for food, feed, or silage and those used for grazing are excluded.")
+        } else if (indicator == "methaneEmissions"){
+            print("Methane emissions are those stemming from human activities such as agriculture and from industrial methane production.")
+            
+        } else if (indicator == "gCF"){
+            print("Gross capital formation (formerly gross domestic investment) consists of outlays on additions to the fixed assets of the economy plus net changes in the level of inventories. Fixed assets include land improvements (fences, ditches, drains, and so on); plant, machinery, and equipment purchases; and the construction of roads, railways, and the like, including schools, offices, hospitals, private residential dwellings, and commercial and industrial buildings. Inventories are stocks of goods held by firms to meet temporary or unexpected fluctuations in production or sales, and 'work in progress.' According to the 1993 SNA, net acquisitions of valuables are also considered capital formation.")
+            
+        } else if (indicator == "forestArea"){
+            print("Forest area is land under natural or planted stands of trees of at least 5 meters in situ, whether productive or not, and excludes tree stands in agricultural production systems (for example, in fruit plantations and agroforestry systems) and trees in urban parks and gardens.")
+        } else if (indicator == "aPL"){
+            print("Agricultural land refers to the share of land area that is arable, under permanent crops, and under permanent pastures. Arable land includes land defined by the FAO as land under temporary crops (double-cropped areas are counted once), temporary meadows for mowing or for pasture, land under market or kitchen gardens, and land temporarily fallow.")
+        } else if (indicator == "cPI"){
+            print("Crop production index shows agricultural production for each year relative to the base period 2014-2016. It includes all crops except fodder crops. Regional and income group aggregates for the FAO's production indexes are calculated from the underlying values in international dollars, normalized to the base period 2014-2016.")
+        } else if (indicator == "aFF"){
+            print("Agriculture corresponds to ISIC divisions 1-5 and includes forestry, hunting, and fishing, as well as cultivation of crops and livestock production. Value added is the net output of a sector after adding up all outputs and subtracting intermediate inputs. It is calculated without making deductions for depreciation of fabricated assets or depletion and degradation of natural resources. The origin of value added is determined by the International Standard Industrial Classification (ISIC), revision 3. Note: For VAB countries, gross value added at factor cost is used as the denominator.")
+        } else if (indicator == "lPI"){
+            print("Livestock production index includes meat and milk from all sources, dairy products such as cheese, and eggs, honey, raw silk, wool, and hides and skins.")
+        }   
+        })
     output$indicatorPlot <- renderPlot({
-        
-        if(input$keyIndicators == 1){
-            percentChange = "percentChange"
-            labTitle = "Change of Forest Cover Percentage by Country"
+            indicator <- input$keyIndicators
+            dependent <- input$netPercent
+            print(dependent)
+            if (dependent == "netForestChange"){
+                labTitle = "Change of Net Forest Cover"
+                yStr = "Annual Net Change of Forest Cover"
+            } else{
+                labTitle = "Change of Forest Cover Percentage"
+                yStr = "Annual Percentage Change of Forest Cover"
+            }
+        if(indicator == "CO2Emissions"){
+            subTitle = "Measured against carbon dioxide emissions"
+            xStr = "CO2 Emissions"
+        } else if (indicator == "cereal"){
+            subTitle = "Measured against production of crops harvested for dry grain"
+            xStr = "Cereal production (metric tons)" 
+        } else if (indicator == "methaneEmissions"){
+            subTitle = "Measured against methane emissions"
+            xStr = "Methane emissions (kt of CO2 equivalent)" 
+        } else if (indicator == "gCF"){
+            subTitle = "Measured against Gross Capital Formation"
+            xStr = "Gross capital formation (% of GDP)" 
+        } else if (indicator == "forestArea"){
+            subTitle = "Measured against Percentage of Area Forested"
+            xStr = "Forest area (% of land area)" 
+        } else if (indicator == "aPL"){
+            subTitle = "Measured against average percent of land devoted to Agriculture"
+            xStr = "Agricultural land (% of land area)" 
+        } else if (indicator == "cPI"){
+            subTitle = "Measured against Crop Production Index"
+            xStr = "Crop Production Index" 
+        } else if (indicator == "aFF"){
             subTitle = "Measured against Agriculture, Fishing, & Forestry Industries"
-            xStr = "Agriculture, Fishing, & Forestry Industries as % of GDP" 
-            yStr = "Annual Percentage Change of Forest Cover"
-        } else if (input$keyIndicator == 2){
-            labStr = labs(title = "Change of Forest Cover Percentage by Country", subtitle = "Measured against the Livestock Production Index") +
-                labs(x = "Livestock Production Index", y = "Annual Percentage Change of Forest Cover")
-        } else if (input$keyIndicator == 3){
-            labStr = labs(title = "Change of Forest Cover Percentage by Country", subtitle = "Measured against average percent of land devoted to Agriculture") +
-                labs(x ="Percent of land designated agriculture" , y = "Annual Percentage Change of Forest Cover")
-        }
-        
-        ggplot(dfrstnIndicators, aes(x = CO2Emissions, y = netForestChange)) +
-            geom_point() +
-            geom_smooth(method="lm") +
-            stat_cor(aes(label = paste(..rr.label..))) + 
-            labs(title = labTitle, subtitle = subTitle) +
-            labs(x = xStr,
-                 y = yStr)
+            xStr = "Agriculture, forestry, and fishing, value added (% of GDP)" 
+        } else if (indicator == "lPI"){
+            subTitle = "Measured against the Livestock Production Index"
+            xStr = "Livestock Production Index" 
+        }   
+            ggplot(dfrstnIndicators, aes_string(x = indicator, y = dependent)) +
+                geom_point() +
+                geom_smooth(method="lm") +
+                stat_cor(aes(label = paste(..rr.label..))) + 
+                labs(title = labTitle, subtitle = subTitle) +
+                labs(x = xStr,
+                     y = yStr)
                 
         
         })
