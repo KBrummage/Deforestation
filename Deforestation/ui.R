@@ -18,10 +18,11 @@ shinyUI(
                     h1("Net Forest Change", align = "center")),
                     sidebarLayout(
                         sidebarPanel(
-                            tags$h2("Global Deforestation Rates", align="center"),
+                            tags$h2("Global Deforestation Rates and Indicators", align="center"),
                             tags$p(tags$b("Deforestation"), "is the permanent removal of trees to make room for something besides forest."),
+                            tags$p("Net deforestation is the amount of deforested land subtracted from the amound of land reclaimed by the forests."),
                             tags$p("This can include clearing the land for agriculture or grazing, or using the timber for fuel, construction or manufacturing."),
-                            tags$hr(),
+                            tags$p("This app was created to showcase the different rates of deforstation globally with respect to net loss and as a percent of a country's total square area."),
                             tags$h4("Top causes of deforestation"),
                             tags$ul(
                                 tags$li("agriculture"),
@@ -31,7 +32,12 @@ shinyUI(
                                 tags$li("increased fire incidence and intensity")
                             )
                         ),
-                        mainPanel(plotOutput("mainMap"))
+                        mainPanel(
+                          plotOutput("mainMap"),
+                          tags$p("Datasets for regarding Deforestation was obtained from ",tags$a(href = "	https://fra-data.fao.org/WO/assessment/fra2020", "this site.")),
+                          tags$p("Datasets of key global indicators to compare against deforestation rates can be found", tags$a(href="https://data.worldbank.org/", "at the World's Bank data site.")),
+                          tags$p("This project was created by Chloe Hu, Luke Robert Brown, and Ken Brummage")
+                          )
                     )
             )
         ),
@@ -81,6 +87,12 @@ shinyUI(
                      
                          sidebarPanel(
                              h2("Moderate correlation between specific global indicators and deforestation"),
+                             radioButtons("keyIndicators", label = h3("key global indicators"),
+                                          choices = list("Agriculture, forestry, and fishing, value added (% of GDP)" = "aFF", 
+                                                         "Livestock production index" = 2, 
+                                                         "Agricultural land (% of land area)" = 3), 
+                                          selected = 1),
+                             
                              tags$ol(
                                tags$li(tags$b("Percentage of GDP in the agriculture/forestry/fishing industry"),
                                        tags$p(tags$em("moderate negative correlation")),
@@ -91,7 +103,8 @@ shinyUI(
                              )
                              
                          ),
-                         mainPanel(plotOutput("affPlot", height = 350),
+                         mainPanel(plotOutput(outputId = "indicatorPlot"),
+                                    plotOutput("affPlot", height = 350),
                                    tags$hr(),
                                    plotOutput("gcfPlot", height = 350)
                         )

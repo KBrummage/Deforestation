@@ -156,6 +156,33 @@ output$plot1 = renderPlot({
                                 breaks = c(-4000000, -3000000, -2000000, -1000000, 0, 1000000, 2000000, 3000000, 4000000))
     })
     
+    output$indicatorPlot <- renderPlot({
+        
+        if(input$keyIndicators == 1){
+            percentChange = "percentChange"
+            labTitle = "Change of Forest Cover Percentage by Country"
+            subTitle = "Measured against Agriculture, Fishing, & Forestry Industries"
+            xStr = "Agriculture, Fishing, & Forestry Industries as % of GDP" 
+            yStr = "Annual Percentage Change of Forest Cover"
+        } else if (input$keyIndicator == 2){
+            labStr = labs(title = "Change of Forest Cover Percentage by Country", subtitle = "Measured against the Livestock Production Index") +
+                labs(x = "Livestock Production Index", y = "Annual Percentage Change of Forest Cover")
+        } else if (input$keyIndicator == 3){
+            labStr = labs(title = "Change of Forest Cover Percentage by Country", subtitle = "Measured against average percent of land devoted to Agriculture") +
+                labs(x ="Percent of land designated agriculture" , y = "Annual Percentage Change of Forest Cover")
+        }
+        
+        ggplot(dfrstnIndicators, aes(x = CO2Emissions, y = netForestChange)) +
+            geom_point() +
+            geom_smooth(method="lm") +
+            stat_cor(aes(label = paste(..rr.label..))) + 
+            labs(title = labTitle, subtitle = subTitle) +
+            labs(x = xStr,
+                 y = yStr)
+                
+        
+        })
+    
     output$affPlot <- renderPlot({
         ggplot(dfrstnIndicators, aes(x = aFF, y = percentChange)) +
             geom_point() +
@@ -196,12 +223,12 @@ output$plot1 = renderPlot({
     
     heatChart <- reactive({
         if(input$percentageChoice == "net"){
-            dfrstn %>% 
+            dfrstnIndicators %>% 
                 filter(Year == input$yearChoice, Entity != "World") %>% 
                 arrange(netForestChange) %>% 
                 head(5)
         } else {
-            dfrstn %>% 
+            dfrstnIndicators %>% 
                 filter(Year == input$yearChoice, Entity != "World") %>% 
                 arrange(netForestChange) %>% 
                 head(5)

@@ -7,44 +7,44 @@ library(tidyverse)
 require(maps)
 library(ggpubr)
 
-deforestationData <- read.csv("Deforestation/data/annual-change-forest-area.csv") %>%
+deforestationData <- read.csv("data/annual-change-forest-area.csv") %>%
   select(Entity, Year, Net.forest.conversion) %>%
   rename(netForestChange = Net.forest.conversion)
 
-sqAreaData <- read.csv("Deforestation/data/landArea.csv") %>%
+sqAreaData <- read.csv("data/landArea.csv") %>%
   select(Country.Name, X2005) %>%
   rename(Entity = Country.Name, totalArea = X2005) %>%
   mutate(totalArea = totalArea * 100)
 
-agricultureFishingForestry <- read.csv("Deforestation/data/agriculture-fishing-forestry-gdp.csv") %>%
+agricultureFishingForestry <- read.csv("data/agriculture-fishing-forestry-gdp.csv") %>%
   select(Country.Name, X2005) %>%
   rename(Entity = Country.Name, aFF = X2005)
 
-grossCapitalFormation <- read.csv("Deforestation/data/gross-capital-formation-gdp.csv") %>%
+grossCapitalFormation <- read.csv("data/gross-capital-formation-gdp.csv") %>%
   select(Country.Name, X2005) %>%
   rename(Entity = Country.Name, cFF = X2005)
 
-agriculturalPercentOfLand <- read.csv("Deforestation/data/agricultural-percent-of-land.csv") %>%
+agriculturalPercentOfLand <- read.csv("data/agricultural-percent-of-land.csv") %>%
   select(Country.Name, X2005) %>%
   rename(Entity = Country.Name, aPL = X2005)
 
-cropProductionIndex <- read.csv("Deforestation/data/crop-production-index.csv") %>%
+cropProductionIndex <- read.csv("data/crop-production-index.csv") %>%
   select(Country.Name, X2005) %>%
   rename(Entity = Country.Name, cPI = X2005)
 
-livestockProductionIndex <- read.csv("Deforestation/data/livestock-production-index.csv") %>%
+livestockProductionIndex <- read.csv("data/livestock-production-index.csv") %>%
   select(Country.Name, X2005) %>%
   rename(Entity = Country.Name, lPI = X2005)
 
-co2Emissions <- read.csv("Deforestation/data/co2Emissions.csv") %>%
+co2Emissions <- read.csv("data/co2Emissions.csv") %>%
   select(Country.Name, X2005) %>%
   rename(Entity = Country.Name, CO2Emissions = X2005)
 
-methaneEmissions <- read.csv("Deforestation/data/methane-emisions.csv") %>%
+methaneEmissions <- read.csv("data/methane-emisions.csv") %>%
   select(Country.Name, X2005) %>%
   rename(Entity = Country.Name, methaneEmissions = X2005)
 
-nitrousOxideEmissions <- read.csv("Deforestation/data/nitrous-oxide-emisions.csv") %>%
+nitrousOxideEmissions <- read.csv("data/nitrous-oxide-emisions.csv") %>%
   select(Country.Name, X2005) %>%
   rename(Entity = Country.Name, nitOxEmission = X2005)
   
