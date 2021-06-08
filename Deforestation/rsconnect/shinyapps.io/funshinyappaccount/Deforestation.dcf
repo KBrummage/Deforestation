@@ -5,9 +5,9 @@ account: funshinyappaccount
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 4221552
-bundleId: 4671342
+bundleId: 4690168
 url: https://funshinyappaccount.shinyapps.io/Deforestation/
-when: 1622692471.28067
-lastSyncTime: 1622692471.28068
+when: 1623115186.8707
+lastSyncTime: 1623115186.87071
 asMultiple: FALSE
 asStatic: FALSE

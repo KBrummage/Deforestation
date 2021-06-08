@@ -1,32 +1,127 @@
+install.packages("shiny", "ggplot2", "dplyr", "tidyverse", "ggpubr", "maps")
+
 library(shiny)
 library(ggplot2)
 library(dplyr)
 library(tidyverse)
 require(maps)
+library(ggpubr)
 
-deforestationData <- read.csv("Deforestation/data/annual-change-forest-area.csv")
-sqAreaData <- read.csv("Deforestation/data/landArea.csv")
-
-dfrstn <- deforestationData %>%
+deforestationData <- read.csv("data/annual-change-forest-area.csv") %>%
   select(Entity, Year, Net.forest.conversion) %>%
   rename(netForestChange = Net.forest.conversion)
- 
-  
-sqArea <- sqAreaData%>%
+
+sqAreaData <- read.csv("data/landArea.csv") %>%
   select(Country.Name, X2005) %>%
   rename(Entity = Country.Name, totalArea = X2005) %>%
-  mutate(totalArea = totalArea * 1000) %>%
+  mutate(totalArea = totalArea * 100)
+
+agricultureFishingForestry <- read.csv("data/agriculture-fishing-forestry-gdp.csv") %>%
+  select(Country.Name, X2005) %>%
+  rename(Entity = Country.Name, aFF = X2005)
+
+grossCapitalFormation <- read.csv("data/gross-capital-formation-gdp.csv") %>%
+  select(Country.Name, X2005) %>%
+  rename(Entity = Country.Name, gCF = X2005)
+
+agriculturalPercentOfLand <- read.csv("data/agricultural-percent-of-land.csv") %>%
+  select(Country.Name, X2005) %>%
+  rename(Entity = Country.Name, aPL = X2005)
+
+cropProductionIndex <- read.csv("data/crop-production-index.csv") %>%
+  select(Country.Name, X2005) %>%
+  rename(Entity = Country.Name, cPI = X2005)
+
+livestockProductionIndex <- read.csv("data/livestock-production-index.csv") %>%
+  select(Country.Name, X2005) %>%
+  rename(Entity = Country.Name, lPI = X2005)
+
+co2Emissions <- read.csv("data/co2Emissions.csv") %>%
+  select(Country.Name, X2005) %>%
+  rename(Entity = Country.Name, CO2Emissions = X2005)
+
+methaneEmissions <- read.csv("data/methane-emisions.csv") %>%
+  select(Country.Name, X2005) %>%
+  rename(Entity = Country.Name, methaneEmissions = X2005)
+
+nitrousOxideEmissions <- read.csv("data/nitrous-oxide-emisions.csv") %>%
+  select(Country.Name, X2005) %>%
+  rename(Entity = Country.Name, nitOxEmission = X2005)
+
+cerealDevelopment <- read.csv("data/cerealProduction.csv") %>%
+  select(Country.Name, X2005) %>%
+  rename(Entity = Country.Name, cereal = X2005)
+
+forestArea <- read.csv("data/forestArea.csv") %>%
+  select(Country.Name, X2005) %>%
+  rename(Entity = Country.Name, forestArea = X2005)
+
+world_map <- map_data("world")
+
+
+
+dfrstnIndicators <- left_join(sqAreaData, deforestationData, by = "Entity" ) %>%
+  mutate(percentChange = (netForestChange/totalArea) * 100)
+
+dfrstnIndicators <- left_join(dfrstnIndicators, agricultureFishingForestry, by = "Entity" )
+dfrstnIndicators <- left_join(dfrstnIndicators, grossCapitalFormation, by = "Entity" )
+dfrstnIndicators <- left_join(dfrstnIndicators, agriculturalPercentOfLand, by = "Entity" )
+dfrstnIndicators <- left_join(dfrstnIndicators, cropProductionIndex, by = "Entity" )
+dfrstnIndicators <- left_join(dfrstnIndicators, livestockProductionIndex, by = "Entity" )
+dfrstnIndicators <- left_join(dfrstnIndicators, co2Emissions, by = "Entity" )
+dfrstnIndicators <- left_join(dfrstnIndicators, methaneEmissions, by = "Entity" )
+dfrstnIndicators <- left_join(dfrstnIndicators, cerealDevelopment, by = "Entity")
+dfrstnIndicators <- left_join(dfrstnIndicators, forestArea, by = "Entity")
+
+plotIndicators <- dfrstnIndicators
+  
+ukraine <- dfrstnIndicators %>%
+  filter(Entity == 'Ukraine')
+
+
+ggplot(ukraine, aes(x=Year)) +
+  geom_line(aes(y=gCF), color="darkred") +
+  geom_line(aes(y=aFF), color="blue") + 
+  labs(title = "Change of Net Forest Cover by Coutry", subtitle = "Measured in Hectares") +
+  labs(x = "Year of Measurement for Net Change",
+       y = "Annual Net Change of Forest Cover (in Hectares)")
+
+dfrstnIndicators <- dfrstnIndicators %>%
+  filter(totalArea < 942469981) %>%
   mutate(Entity = replace(Entity, Entity == "United States", "USA"))
 
-world_map <- map_data("world") %>%
-  
-dfrstn <- left_join(sqArea, dfrstn, by = "Entity" )
+ggplot(dfrstnIndicators, aes(x = CO2Emissions/(totalArea-forestArea), y = netForestChange)) +
+  geom_point() +
+  geom_smooth(method="lm") +
+  stat_cor(aes(label = paste(..rr.label..)))
 
+dfrstn00Indicators <- dfrstnIndicators %>%
+  filter(totalArea < 942469981, Year == 2010)
+dfrstn90Indicators <- dfrstnIndicators %>%
+  filter(totalArea < 942469981, Year == 2010)
+dfrstn15Indicators <- dfrstnIndicators %>%
+  filter(totalArea < 942469981, Year == 2010)
+  
+
+
+sqAreaLuke <- sqArea 
 dfrstn <- dfrstn %>%
-  mutate(percentChange = (netForestChange/totalArea) * 100)
+  mutate(percentChange = (netForest/totalArea) * 100)
+
+chloeDef <- dfrstn %>% 
+  filter(Year == "2000") %>% 
+  arrange(netForestChange) %>% 
+  head(5)
 
 dfrstnForMap <- dfrstn %>%
   rename(region = Entity)
+
+dfrstnForChart <- dfrstn %>%
+  filter(Entity != "World") 
+
+print(c(unique(dfrstnForChart$Entity)))
+  
+
 
 dfrstn15 <- dfrstnForMap %>%
   filter(Year == 2015)
@@ -39,6 +134,37 @@ dfrstn10 <- dfrstnForMap %>%
 
 dfrstn90 <- dfrstnForMap %>%
   filter(Year == 1990)
+
+aff <- left_join(aff, gcf, by = "region")
+Indicators <- left_join(dfrstnForMap, aff, by = "region")
+
+Indicators <- Indicators %>%
+  rename(netForest = netForestChange) %>%
+  na.omit()
+
+ggplot(Indicators, aes(x = aff, y = percentChange)) +
+  geom_point() +
+  geom_smooth(method="lm") +
+  xlim(15, 30) +
+  ylim(-.1, .1)
+
+lm_eqn <- function(df){
+  m <- lm(percentChange ~ aFF, df);
+  eq <- substitute(italic(netForestChange) == a + b %.% italic(aFF)*","~~italic(r)^2~"="~r2, 
+                   list(a = format(unname(coef(m)[1]), digits = 2),
+                        b = format(unname(coef(m)[2]), digits = 2),
+                        r2 = format(summary(m)$r.squared, digits = 3)))
+  as.character(as.expression(eq));
+}
+
+cor.test(dfrstnIndicators$netForestChange, dfrstnIndicators$CO2Emissions,  method = "pearson", conf.level = 0.95)
+print(summary(lm(netForestChange ~ CO2Emissions/totalArea, dfrstn10Indicators))$r.squared * 100, digits = 3)
+
+
+ggplot(dfrstnIndicators, aes(x = urbDev, y = netForestChange)) +
+  geom_point() +
+  geom_smooth(method="lm") +
+  stat_cor(aes(label = paste(..rr.label..)))
 
 dfrstn15Map <- left_join(world_map,dfrstn15, by = "region")
 dfrstn10Map <- left_join(world_map,dfrstn10, by = "region")
