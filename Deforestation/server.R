@@ -5,7 +5,7 @@
 # Find out more about building applications with Shiny here:
 #
 #    http://shiny.rstudio.com/
-#
+# To install packages, uncomment line below and run.
 # install.packages("shiny", "ggplot2", "dplyr", "tidyverse", "ggpubr", "maps")
 library(shiny)
 library(ggplot2)
@@ -75,6 +75,8 @@ dfrstnIndicators <- left_join(dfrstnIndicators, methaneEmissions, by = "Entity" 
 dfrstnIndicators <- left_join(dfrstnIndicators, cerealDevelopment, by = "Entity")
 dfrstnIndicators <- left_join(dfrstnIndicators, forestArea, by = "Entity")
 
+plotIndicators <- dfrstnIndicators
+
 dfrstnIndicators <- dfrstnIndicators %>%
     filter(totalArea < 942469981) %>%
     mutate(Entity = replace(Entity, Entity == "United States", "USA"))
@@ -118,22 +120,15 @@ dfrstn10Map <- left_join(world_map,dfrstn10, by = "region")
 dfrstn00Map <- left_join(world_map,dfrstn00, by = "region")
 dfrstn90Map <- left_join(world_map,dfrstn90, by = "region")
 
-output$plot = renderPlot({
-    ggplot(dfrstn[ which(dfrstn$Entity==input$country),], aes(x=Year)) +
-        geom_line(aes(y=netForestChange), color="darkred") +
-            labs(title = "Change of Net Forest Cover by Coutry", subtitle = "Measured in Hectares") +
-            labs(x = "Year of Measurement for Net Change",
-                 y = "Annual Net Change of Forest Cover (in Hectares)")
-    })
 
 output$plot1 = renderPlot({
-    ggplot(dfrstnIndicators[ which(dfrstnIndicators$Entity==input$country),], aes(x=Year)) +
+    ggplot(plotIndicators[ which(plotIndicators$Entity==input$country),], aes(x=Year)) +
         geom_line(aes(y=netForestChange), color="darkred") +
         labs(title = "Change of Net Forest Cover by Coutry", subtitle = "Measured in Hectares") +
         labs(x = "Year of Measurement for Net Change",
              y = "Annual Net Change of Forest Cover (in Hectares)")
 })
-    
+
     output$mainMap <- renderPlot({
         data = dfrstn15Map
         fillChoice = "netForestChange"
@@ -239,29 +234,6 @@ output$plot1 = renderPlot({
         
         })
     
-    output$affPlot <- renderPlot({
-        ggplot(dfrstnIndicators, aes(x = aFF, y = percentChange)) +
-            geom_point() +
-            geom_smooth(method="lm") +
-            xlim(15, 30) +
-            ylim(-.1, .1) +
-            labs(title = "Change of Forest Cover Percentage by Country", subtitle = "Measured against Agriculture, Fishing, & Forestry Industries") +
-            labs(x = "Agriculture, Fishing, & Forestry Industries as % of GDP",
-                 y = "Annual Percentage Change of Forest Cover")
-        
-    })
-    
-    output$gcfPlot <- renderPlot({
-        ggplot(dfrstnIndicators, aes(x = cFF, y = percentChange)) +
-            geom_point() +
-            geom_smooth(method="lm") +
-            xlim(15, 30) +
-            ylim(-.1, .1) +
-            labs(title = "Change of Forest Cover Percentage by Country", subtitle = "Measured against Gross Capital Formation") +
-            labs(x = "Gross Capital Formation as % of GDP",
-                 y = "Annual Percentage Change of Forest Cover")
-        
-    })
     
     ChloePlot <- reactive({
         if(input$percentageChloe == "net"){

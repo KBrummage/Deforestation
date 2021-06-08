@@ -42,6 +42,41 @@ shinyUI(
             )
         ),
         
+        tabPanel("Key Global Indicators",
+                 fluidPage(
+                   titlePanel(
+                     h1("Largest Indicators of Deforestation Globally", align = "center")),
+                   
+                   sidebarPanel(
+                     h2("Moderate correlation between specific global indicators and deforestation"),
+                     radioButtons("keyIndicators", label = h3("key global indicators"),
+                                  choices = list("CO2 Emissions" = "CO2Emissions",
+                                                 "Cereal Production" = "cereal",
+                                                 "Methane Emissions" = "methaneEmissions",
+                                                 "Gross Capital Formation (% of GDP)" = "gCF",
+                                                 "Forest area (% of land area)" = "forestArea",
+                                                 "Livestock production index" = "lPI", 
+                                                 "Agricultural land (% of land area)" = "aPL",
+                                                 "Crop Production Index" = "cPI",
+                                                 "Agriculture, forestry, and fishing, value added (% of GDP)" = "aFF" 
+                                                 
+                                  ), 
+                                  selected = "CO2Emissions"),
+                     radioButtons("netPercent", label = h3("annual net or percent difference"),
+                                  choices = list("Annual Net Change of Forest Cover" = "netForestChange",
+                                                 "Annual Percentage Change of Forest Cover" = "percentChange" 
+                                  ), 
+                                  selected = "netForestChange")
+                     
+                   ),
+                   mainPanel(plotOutput(outputId = "indicatorPlot"),
+                             tags$p(textOutput("value"))
+                   )
+                   
+                 )
+                 
+        ),
+        
         tabPanel("Major Contributors to Deforestation",
             fluidPage(
                 h1("Global Deforestation Rates", align="center"),
@@ -79,53 +114,27 @@ shinyUI(
                 mainPanel(plotOutput("plot1"))
             )
         ),
-        
-        tabPanel("Key Global Indicators",
-                 fluidPage(
-                     titlePanel(
-                         h1("Largest Indicators of Deforestation Globally", align = "center")),
-                     
-                         sidebarPanel(
-                             h2("Moderate correlation between specific global indicators and deforestation"),
-                             radioButtons("keyIndicators", label = h3("key global indicators"),
-                                          choices = list("CO2 Emissions" = "CO2Emissions",
-                                                         "Cereal Production" = "cereal",
-                                                         "Methane Emissions" = "methaneEmissions",
-                                                         "Gross Capital Formation (% of GDP)" = "gCF",
-                                                         "Forest area (% of land area)" = "forestArea",
-                                                         "Livestock production index" = "lPI", 
-                                                         "Agricultural land (% of land area)" = "aPL",
-                                                         "Crop Production Index" = "cPI",
-                                                         "Agriculture, forestry, and fishing, value added (% of GDP)" = "aFF" 
-                                                        
-                                                         ), 
-                                          selected = "CO2Emissions"),
-                             radioButtons("netPercent", label = h3("annual net or percent difference"),
-                                          choices = list("Annual Net Change of Forest Cover" = "netForestChange",
-                                                        "Annual Percentage Change of Forest Cover" = "percentChange" 
-                                                        ), 
-                                          selected = "netForestChange")
 
-                         ),
-                         mainPanel(plotOutput(outputId = "indicatorPlot"),
-                                   tags$p(textOutput("value"))
-                                   )
-                                   
-                        )
-                 
-        ),
         tabPanel("Key Take Aways",
                  fluidPage(
                      titlePanel(
                          h1("Key Take Aways", align = "center")),
                      mainPanel(
                        tags$ul(
-                         tags$li(tags$h4("Finding key indicators that can predict deforestation is not as simple as perceived.")),
-                         tags$li(tags$h4("There is a moderate correlation between agriculture industries")),
-                         tags$li(tags$h4("With a total of 127 billion hectares globally, and only 74 billion reported on average for each period, roughly 42% of global data is missing.")),
-                         tags$li(tags$h4("Changes due to global conflicts are hard to decipher"))
-                         ),
-                       
+                        tags$li(tags$h4("There is a moderate correlation between agriculture industries"),
+                                  tags$p("The most notable insight we had was when analyzing the CO2 emissions indicator variable. We found that there was a low, positive correlation between CO2 Emissions and net forest change (in hectares). We obtained a R-value of 0.2, which is a significant R-value for a low correlation.  This is saying that, generally, as a country has higher amounts of CO2 emissions, they are losing less forest area each year. This, intuitively, doesn’t make sense as we would expect countries with high C02 emissions to lose the most forest each year. Further research led us to find that CO2 emissions from deforestation account for roughly 20% of global CO2 emissions, pointing towards the negative trend we did not find.")
+                                 ),
+                        tags$li(tags$h4("Finding key indicators that can predict deforestation is not as simple as perceived."),
+                                tags$p("Most of our data was taken from the indicators page from the world bank. We think this data is probably some of the higher quality data available for the indicators we analyzed. I expect completely unbiased results.")
+                                ),
+                         tags$li(tags$h4("With a total of 127 billion hectares globally, and only 74 billion reported on average for each period, roughly 42% of global data is missing."),
+                                 tags$p("There were some non-inconsequential gaps in the data for some years, mainly in less developed countries which could have skewed our results. We do not see issues with the data potentially harming anyone.  Advancing this project may very well come down to having data for every country for certain indicators.")
+                                 ),
+                         tags$li(tags$h4("Changes due to complex global economies are hard to decipher"),
+                                 tags$p("Due to the seemingly enless causes of deforestation, coupled with the fickle natural global recovery of forests, it is exceedingly difficult to locate the key indicators for a country's cause of deforestation - if one even exists.")
+                         )
+                       ),
+                       tags$a(href="https://github.com/KBrummage/Deforestation", "Take a look at our repo." )
                        )
                      )
                  

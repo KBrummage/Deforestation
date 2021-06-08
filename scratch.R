@@ -48,11 +48,6 @@ nitrousOxideEmissions <- read.csv("data/nitrous-oxide-emisions.csv") %>%
   select(Country.Name, X2005) %>%
   rename(Entity = Country.Name, nitOxEmission = X2005)
 
-urbanDevelopment <- read.csv("data/urbanDevelopment.csv") %>%
-  filter(Indicator.Code == "SP.URB.GROW") %>%
-  select(Country.Name, X2005) %>%
-  rename(Entity = Country.Name, urbDev = X2005)
-
 cerealDevelopment <- read.csv("data/cerealProduction.csv") %>%
   select(Country.Name, X2005) %>%
   rename(Entity = Country.Name, cereal = X2005)
@@ -75,22 +70,30 @@ dfrstnIndicators <- left_join(dfrstnIndicators, cropProductionIndex, by = "Entit
 dfrstnIndicators <- left_join(dfrstnIndicators, livestockProductionIndex, by = "Entity" )
 dfrstnIndicators <- left_join(dfrstnIndicators, co2Emissions, by = "Entity" )
 dfrstnIndicators <- left_join(dfrstnIndicators, methaneEmissions, by = "Entity" )
-dfrstnIndicators <- left_join(dfrstnIndicators, urbanDevelopment, by = "Entity" )
 dfrstnIndicators <- left_join(dfrstnIndicators, cerealDevelopment, by = "Entity")
 dfrstnIndicators <- left_join(dfrstnIndicators, forestArea, by = "Entity")
 
+plotIndicators <- dfrstnIndicators
+  
+ukraine <- dfrstnIndicators %>%
+  filter(Entity == 'Ukraine')
+
+
+ggplot(ukraine, aes(x=Year)) +
+  geom_line(aes(y=gCF), color="darkred") +
+  geom_line(aes(y=aFF), color="blue") + 
+  labs(title = "Change of Net Forest Cover by Coutry", subtitle = "Measured in Hectares") +
+  labs(x = "Year of Measurement for Net Change",
+       y = "Annual Net Change of Forest Cover (in Hectares)")
 
 dfrstnIndicators <- dfrstnIndicators %>%
   filter(totalArea < 942469981) %>%
   mutate(Entity = replace(Entity, Entity == "United States", "USA"))
 
-ggplot(dfrstnIndicators, aes(x = CO2Emissions , y = netForestChange)) +
+ggplot(dfrstnIndicators, aes(x = CO2Emissions/(totalArea-forestArea), y = netForestChange)) +
   geom_point() +
   geom_smooth(method="lm") +
   stat_cor(aes(label = paste(..rr.label..)))
-
-netForestChange
-percentChange
 
 dfrstn00Indicators <- dfrstnIndicators %>%
   filter(totalArea < 942469981, Year == 2010)
